@@ -43,6 +43,13 @@ namespace EdDbLib {
             return true;
         }
 
+        public bool Insert(Student student, string MajorCode) {
+            var majorCtrl = new MajorsController(this.Connection);
+            var major = majorCtrl.GetByCode(MajorCode);
+            student.MajorId = major?.Id;
+            return Insert(student);
+        }
+
         public bool Insert(Student student) {
             var majorid = (student.MajorId == null)
                 ? " NULL "

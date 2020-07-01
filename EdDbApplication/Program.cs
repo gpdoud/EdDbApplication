@@ -8,9 +8,33 @@ using EdDbLib;
 namespace EdDbApplication {
     class Program {
         static void Main() {
-            TestConnection();
+            TestStudentController();
         } 
-        static void TestConnection() {
+        static void TestMajorsController() {
+            var connection = new Connection("localhost", "sqlexpress", "EdDb");
+            var majorsCtrl = new MajorsController(connection);
+
+            var MajorUWBW = majorsCtrl.GetByCode("UWBW");
+
+            //var newMajor = new Major {
+            //    Code = "UWBW",
+            //    Description = "Underwater Basket Weaving",
+            //    MinSat = 1600
+            //};
+            //var success1 = majorsCtrl.Insert(newMajor);
+
+            //var major = majorsCtrl.GetByPK(10);
+            //major.Description = "A change by Greg";
+            //var success = majorsCtrl.Update(major);
+
+            //var success = majorsCtrl.Delete(9);
+
+            //var majors = majorsCtrl.GetAll();
+            //var major1 = majorsCtrl.GetByPK(1);
+            //var major0 = majorsCtrl.GetByPK(0);
+        }
+        #region Tests
+        static void TestStudentController() {
             var connection = new Connection("localhost", "sqlexpress", "EdDb");
             var studentsCtrl = new StudentsController(connection);
 
@@ -22,23 +46,23 @@ namespace EdDbApplication {
                 GPA = 2.5m,
                 MajorId = null
             };
-            //var itWorked = studentsCtrl.Insert(newStudent);
+            var itWorked = studentsCtrl.Insert(newStudent, "UWBW");
 
-            var fred = new Student(61) {
-                Firstname = "Fredrick",
-                Lastname = "Flintstone",
-                StateCode = "SA",
-                SAT = 1000,
-                GPA = 2.5m,
-                MajorId = null
-            };
+            //var fred = new Student(61) {
+            //    Firstname = "Fredrick",
+            //    Lastname = "Flintstone",
+            //    StateCode = "SA",
+            //    SAT = 1000,
+            //    GPA = 2.5m,
+            //    MajorId = null
+            //};
             //var itWorked = studentsCtrl.Update(fred);
 
-            var itWorked = studentsCtrl.Delete(100);
+            //var itWorked = studentsCtrl.Delete(100);
             
-            var student = studentsCtrl.GetByPK(10);
-            var noStudent = studentsCtrl.GetByPK(-1);
-            var students = studentsCtrl.GetAll();
+            //var student = studentsCtrl.GetByPK(10);
+            //var noStudent = studentsCtrl.GetByPK(-1);
+            //var students = studentsCtrl.GetAll();
             
             connection.Close();
         }
@@ -73,5 +97,6 @@ namespace EdDbApplication {
 
             sqlConn.Close();
         }
+        #endregion
     }
 }
