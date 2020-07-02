@@ -4,12 +4,65 @@ using System.Data;
 using System.Data.SqlClient;
 
 using EdDbLib;
+using EdDbLib.Controllers;
+using EdDbLib.Models;
 
 namespace EdDbApplication {
     class Program {
+        private const string Server = "localhost";
+        private const string Instance = "sqlexpress";
+        private const string Database = "EdDb";
+
         static void Main() {
-            TestStudentController();
+            TestTransactions();
         } 
+        #region Tests
+        static void TestTransactions() {
+            var conn = new Connection(Server, Instance, Database);
+            var MajorCtrl = new MajorsController(conn);
+            var major = new Major() { Code = "ZZZZ", Description = "ALL Zs", MinSat = 800 };
+            MajorCtrl.BeginTransaction();
+            MajorCtrl.Insert(major);
+            MajorCtrl.RollbackTransaction();
+
+        }
+        static void TestClassesController() {
+            var conn = new Connection(Server, Instance, Database);
+            var ClsCtrl = new ClassesController(conn);
+
+            var classes = ClsCtrl.GetAll();
+            var class1 = ClsCtrl.GetByPK(1);
+            var mat404 = ClsCtrl.GetByCode("MAT404");
+
+            var cls = new Class() {
+                Code = "UBW901", Subject = "Under Water Basket Weaving", Section = 901, InstructorId = null
+            };
+            var result = ClsCtrl.Insert(cls, "Tensi");
+            cls = ClsCtrl.GetByCode("UBW901");
+            cls.InstructorId = 1;
+            result = ClsCtrl.Update(cls);
+            result = ClsCtrl.Delete(cls.Id);
+
+            conn.Close();
+        }
+        static void TestInstructorsController() {
+            var conn = new Connection(Server, Instance, Database);
+            var InstCtrl = new InstructorsController(conn);
+
+            var albert = new Instructor() {
+                Firstname = "Albert", Lastname = "Einstein", YearsExperience = 50, IsTenured = false
+            };
+            var result = InstCtrl.Insert(albert);
+            albert = InstCtrl.GetByLastname("Einstein");
+            albert.IsTenured = true;
+            result = InstCtrl.Update(albert);
+            result = InstCtrl.Delete(albert.Id);
+
+            var instructor1 = InstCtrl.GetByPK(1);
+            var instructors = InstCtrl.GetAll();
+            
+            conn.Close();
+        }
         static void TestMajorsController() {
             var connection = new Connection("localhost", "sqlexpress", "EdDb");
             var majorsCtrl = new MajorsController(connection);
@@ -33,7 +86,6 @@ namespace EdDbApplication {
             //var major1 = majorsCtrl.GetByPK(1);
             //var major0 = majorsCtrl.GetByPK(0);
         }
-        #region Tests
         static void TestStudentController() {
             var connection = new Connection("localhost", "sqlexpress", "EdDb");
             var studentsCtrl = new StudentsController(connection);

@@ -14,15 +14,16 @@ namespace EdDbLib {
 
         private string _code = string.Empty;
         public string Code { 
-            get {
-                return _code;
-            }
-            set {
-                if(value.Length > 4) {
-                    throw new Exception("Code length must be <= 4");
-                }
-                _code = value;
-            } 
+            get => _code;
+            
+            set => CheckLength(_code, 4, value);
+            
+        }
+
+        private void CheckLength(string field, int maxLength, string value) {
+            if(value.Length > maxLength)
+                throw new Exception("MMMMMM");
+            field = value;
         }
 
         private string _description = string.Empty;

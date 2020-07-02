@@ -3,21 +3,17 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
+using EdDbLib.Controllers;
+
 namespace EdDbLib {
     
-    public class StudentsController {
-
-        public Connection Connection { get; private set; } = null;
+    public class StudentsController : BaseController {
 
         public bool Delete(int Id) {
             var sql = $"DELETE From Student Where Id = {Id}";
             var sqlCmd = new SqlCommand(sql, Connection.sqlConnection);
             var rowsAffected = sqlCmd.ExecuteNonQuery();
-            if(rowsAffected != 1) {
-                throw new Exception("Delete return result not 1");
-            }
-            // if we get here, it worked!
-            return true;
+            return CheckRowsAffected(rowsAffected);
         }
 
         public bool Update(Student student) {
@@ -36,11 +32,7 @@ namespace EdDbLib {
 
             var sqlCmd = new SqlCommand(sql, Connection.sqlConnection);
             var rowsAffected = sqlCmd.ExecuteNonQuery();
-            if(rowsAffected != 1) {
-                throw new Exception("Update return result not 1");
-            }
-            // if we get here, it worked!
-            return true;
+            return CheckRowsAffected(rowsAffected);
         }
 
         public bool Insert(Student student, string MajorCode) {
@@ -63,11 +55,7 @@ namespace EdDbLib {
                         $" {majorid});";
             var sqlCmd = new SqlCommand(sql, Connection.sqlConnection);
             var rowsAffected = sqlCmd.ExecuteNonQuery();
-            if(rowsAffected != 1) {
-                throw new Exception("Insert return result not 1");
-            }
-            // if we get here, it worked!
-            return true;
+            return CheckRowsAffected(rowsAffected);
         }
 
         public Student GetByPK(int Id) {
@@ -118,8 +106,7 @@ namespace EdDbLib {
             return students;
         }
 
-        public StudentsController(Connection connection) {
-            this.Connection = connection;
+        public StudentsController(Connection connection) : base(connection) {
         }
     }
 }

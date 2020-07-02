@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
+using EdDbLib.Controllers;
+
 namespace EdDbLib {
     
-    public class MajorsController {
-
-        public Connection Connection { get; private set; } = null;
+    public class MajorsController : BaseController {
 
         public Major GetByCode(string Code) {
             var sql = $"SELECT * from Major Where Code = @Code;";
@@ -36,11 +36,7 @@ namespace EdDbLib {
                         "VALUES (@Code, @Description, @MinSAT);";
             var cmd = CreateAndFillParameters(major, sql);
             var rowsAffected = cmd.ExecuteNonQuery();
-            switch(rowsAffected) {
-                case 0: return false;
-                case 1: return true;
-                default: throw new Exception($"ERROR: Inserted { rowsAffected } rows!");
-            }
+            return CheckRowsAffected(rowsAffected);
         }
 
         public bool Update(Major major) {
@@ -52,11 +48,7 @@ namespace EdDbLib {
             var cmd = CreateAndFillParameters(major, sql);
             cmd.Parameters.AddWithValue("@Id", major.Id);
             var rowsAffected = cmd.ExecuteNonQuery();
-            switch(rowsAffected) {
-                case 0: return false;
-                case 1: return true;
-                default: throw new Exception($"ERROR: Updated { rowsAffected } rows!");
-            }
+            return CheckRowsAffected(rowsAffected);
         }
 
         private SqlCommand CreateAndFillParameters(Major major, string sql) {
@@ -76,11 +68,7 @@ namespace EdDbLib {
                 // need to catch RefIntgrity exception
                 int rowsAffected = cmd.ExecuteNonQuery();
 
-                switch(rowsAffected) {
-                    case 0: return false;
-                    case 1: return true;
-                    default: throw new Exception($"ERROR: Deleted { rowsAffected } rows!");
-                }
+                return CheckRowsAffected(rowsAffected);
             } catch(SqlException ex) {
                 var refIntEx 
                     = new Exceptions.ReferentialIntegrityException("Cannot delete major used by student", ex);
@@ -139,8 +127,7 @@ namespace EdDbLib {
             return major;
         }
 
-        public MajorsController(Connection connection) {
-            Connection = connection;
+        public MajorsController(Connection connection) : base(connection) {
         }
     }
 }
