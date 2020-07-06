@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
+using System.Linq;
 
 using EdDbLib.Models;
 
@@ -9,6 +10,21 @@ namespace EdDbLib.Controllers {
     
     public class ClassesController : BaseController {
 
+        public class ClassWithInstructor {
+            public Class Class { get; set; }
+            public Instructor Instructor { get; set; }
+        }
+
+        public IEnumerable<ClassWithInstructor> GetClassesWithInstructor() {
+            var instCtrl = new InstructorsController(Connection);
+            var classes = from c in GetAll()
+                          join i in instCtrl.GetAll()
+                          on c.InstructorId equals i.Id
+                          select new ClassWithInstructor {
+                              Class = c, Instructor = i
+                          };
+            return classes;
+        }
 
         public bool Delete(int Id) {
             var cmd = new SqlCommand(Class.SqlDelete, Connection.sqlConnection);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 
 using EdDbLib.Controllers;
@@ -8,6 +9,49 @@ using EdDbLib.Controllers;
 namespace EdDbLib {
     
     public class StudentsController : BaseController {
+        
+        public struct StudentsPerState {
+            public string StateCode { get; set; }
+            public int Count { get; set; }
+        }
+        public struct StudentAndMajor {
+            public int Id { get; set; }
+            public string Fullname { get; set; }
+            public string Major { get; set; }
+        }
+
+        public IEnumerable<StudentAndMajor> GetStudentWithMajor() {
+            var majCtrl = new MajorsController(Connection);
+            var students = from s in GetAll()
+                           join m in majCtrl.GetAll()
+                           on s.MajorId equals m.Id into sm
+                           from s2 in sm.DefaultIfEmpty()
+                           select new StudentAndMajor {
+                               Id = s.Id, 
+                               Fullname = $"{s.Firstname} {s.Lastname}", 
+                               Major = s2?.Description ?? "Undeclared"
+                           };
+            return students;            
+        }
+
+        public IEnumerable<StudentsPerState> GetStudentsPerState() {
+
+            var studentsPerState = from s in GetAll()
+                                   group s by s.StateCode into sc
+                                   select new StudentsPerState {
+                                       StateCode = sc.Key, Count = sc.Count()
+                                   };
+            return studentsPerState;
+        }
+
+        public IEnumerable<Student> GetByLastname(string Lastname) {
+            var students = GetAll();
+            var someStudents = from s in students
+                               where s.Lastname.StartsWith(Lastname)
+                               orderby s.Lastname
+                               select s;
+            return someStudents;
+        }
 
         public bool Delete(int Id) {
             var sql = $"DELETE From Student Where Id = {Id}";

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 
 using EdDbLib;
 using EdDbLib.Controllers;
@@ -14,9 +15,19 @@ namespace EdDbApplication {
         private const string Database = "EdDb";
 
         static void Main() {
-            TestTransactions();
+            TestLinq();
         } 
         #region Tests
+        static void TestLinq() {
+            var conn = new Connection(Server, Instance, Database);
+            var stdCtrl = new StudentsController(conn);
+            var students = stdCtrl.GetByLastname("E");
+            var studentsByState = stdCtrl.GetStudentsPerState();
+            var studentsWithMajor = stdCtrl.GetStudentWithMajor();
+            var clsCtrl = new ClassesController(conn);
+            var classesWithInstructors = clsCtrl.GetClassesWithInstructor();
+            conn.Close();
+        }
         static void TestTransactions() {
             var conn = new Connection(Server, Instance, Database);
             var MajorCtrl = new MajorsController(conn);
@@ -44,6 +55,8 @@ namespace EdDbApplication {
             result = ClsCtrl.Delete(cls.Id);
 
             conn.Close();
+
+            var mathClasses = classes.Where(c => c.Code.StartsWith("MAT")).ToList();
         }
         static void TestInstructorsController() {
             var conn = new Connection(Server, Instance, Database);
